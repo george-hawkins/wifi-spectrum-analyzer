@@ -11,7 +11,7 @@ While I came up with the particular hardware selection below, all the real work 
 
 Parts:
 
-* [NRF24L01+ DIP module](https://www.aliexpress.com/item/32330779943.html)
+* [nRF24L01+ DIP module](https://www.aliexpress.com/item/32330779943.html)
 * [RP2040-Zero](https://www.aliexpress.com/item/1005004967926448.html) (buy the one with the header already soldered to save yourself time later).
 * [128x64 1.3" white OLED module](https://www.aliexpress.com/item/1005003484018034.html)
 * [3.3V voltage regulator](https://www.aliexpress.com/item/32464952488.html)
@@ -48,6 +48,21 @@ I'd be curious to know if others think they can do better than this solution whi
 An obvious first upgrade would be to use a larger 320x240 screen like the 2" and 2.8" models available [here](https://www.aliexpress.com/item/1005003797803015.html) (other product pages on AliExpress, with the same 2" model, describe it as an OLED but I don't see anything on the silkscreen to confirm this).
 
 The sketch has nice features, e.g. the max values seen across the spectrum are decayed over time so, the impact of intermittent events isn't immediately lost.
+
+nRF24L01+ breadboard adapter
+----------------------------
+
+I think you're better off plugging jumper wires straight into the pins on the nRF24L01+ module but if you really want to mount it on a breadboard, you'll need an adapter.
+
+You can just get a plain DIP-8 breadboard adapter like this [one](https://www.chipquik.com/store/product_info.php?products_id=2700080) from Chip Quik that Digikey sell for around US$5.80.
+
+A cheaper alternative is to use an adapter meant for the common ESP8266 modules that also use a 2x4 pin layout. The part up above all come from one store on AliExpress and that store also has an adapter for ESP8266 modules [here](https://www.aliexpress.com/item/32840204126.html) for US$0.27.
+
+The adapter comes with a little capacitor for reducing noise on the power pins but as those pins aren't in the same location on the ESP8266 module and the nRF24L01+ module, you'd need to desolder it and short the pads it was connected to with a small blob of solder.
+
+If you don't like desoldering SMD components, other stores also carry a version of the board with a thru-hole capacitor, e.g. [here](https://www.aliexpress.com/item/1005002597510818.html).
+
+TODO: of course, you can avoid this issue by buying the nRF24L01+ SMD module where the pins are in a single row (like on the OLED module).
 
 Waveshare
 ---------
