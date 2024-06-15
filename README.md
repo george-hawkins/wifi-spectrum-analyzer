@@ -49,6 +49,38 @@ An obvious first upgrade would be to use a larger 320x240 screen like the 2" and
 
 The sketch has nice features, e.g. the max values seen across the spectrum are decayed over time so, the impact of intermittent events isn't immediately lost.
 
+Breadboard
+----------
+
+![breadboard](breadboard/breadboard_bb.png)
+
+As well as the breadboard layout of the various parts, the diagram above also includes larger views of the pinouts for the RP2040-Zero, OLED module and nRF module in order to make the SPI pins involved clearer.
+
+**Warning:** different SPI OLED modules will have the same set of seven pins but there's no consistency in the order of these pins - I've shown the pinouts for both the [Waveshare 1.3" OLED (variant B)](https://www.waveshare.com/1.3inch-OLED-B.htm) and for the OLED module from AliExpress (that's linked to above).
+
+SPI pin names
+-------------
+
+There's some inconsistency in labelling SPI pins on various breakouts, particularly ones where some of the pins can be used for both SPI and I2C.
+
+E.g. on the boards used in this project, you may see these alternative names for the various SPI pins:
+
+* MISO / SPI RX / SCL
+* MOSI / SPI TX / SDA
+* CLK / SCLK / SCK
+* CSn / CS / SS
+
+For SPI, I'd use the names MISO, MOSI, CLK and CSn. And I'd view the names SCL, SDA and SCK as names for similar functions in I2C which ideally shouldn't be used when describing an SPI interface.
+
+Then there's CS, SS and CSn (and even nCS and CSN) which are all valid names for the same SPI function and their use just seems to depend on manufacturer preferences.
+
+Finally, there's MISO vs SPI RX and MOSI vs SPI TX - the "MI" is MISO stands for "master input" and the "MO" in MOSI stands for "master output" so, you can see how they can be equated with RX and and TX. However, while understood, using RX and TX seems vanishingly rare in the hobbyist domain and I've no idea why Wavecom uses them in their pinout diagrams for the RP2040-Zero.
+
+Breadboard
+----------
+
+I've soldered the header for pins 9 to 13 of the RP2040-Zero pointing upwards in order to make it possible to plug it into a breadboard. However, if you've only got one RP2040-Zero and plan to solder it to a protoboard then obviously all header should be soldered pointing downward.
+
 nRF24L01+ breadboard adapter
 ----------------------------
 
@@ -73,3 +105,14 @@ If you'd rather buy from a name-brand like Waveshare rather than AliExpress, her
 
 * [RP2040-Zero](https://www.waveshare.com/rp2040-zero.htm)
 * [128x64 1.3" blue OLED module](https://www.waveshare.com/1.3inch-oled-b.htm)
+
+Credits
+-------
+
+The breadboard diagram above was created using [Fritzing](https://fritzing.org/).
+
+The Fritzing Waveshare 1.3" OLED part was created by A. Horneffer and was found [here](https://forum.fritzing.org/t/waveshare-1-3-inch-oled-with-sh1106/4848/6).
+
+The Fritzing Waveshare RP2040-Zero part was created by Peter Van Epp and was found [here](https://forum.fritzing.org/t/part-request-waveshare-rp2040-zero/16705/2).
+
+And as already noted above, the main `scannerGraphic.ino` sketch was created by [2bndy](https://github.com/2bndy5).
