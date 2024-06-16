@@ -58,6 +58,76 @@ As well as the breadboard layout of the various parts, the diagram above also in
 
 **Warning:** different SPI OLED modules will have the same set of seven pins but there's no consistency in the order of these pins - I've shown the pinouts for both the [Waveshare 1.3" OLED (variant B)](https://www.waveshare.com/1.3inch-OLED-B.htm) and for the OLED module from AliExpress (that's linked to above).
 
+I've soldered the header for pins 9 to 13 of the RP2040-Zero pointing upwards in order to make it possible to plug it into a breadboard. However, if you've only got one RP2040-Zero and plan to solder it to a protoboard then obviously all header should be soldered pointing downward.
+
+RP2040-Zero blink LED
+---------------------
+
+The RP2040-Zero is extremely similar to the Raspberry Pi Pico so, there's no real separate documentation for the Zero (beyond what's in the RP2040-Zero [wiki page](https://www.waveshare.com/wiki/RP2040-Zero)) - all the documentation that applies for the Pico applies to the Zero.
+
+Except that the Zero has fewer pins and it has an WS2812 RGB LED (often referred to as a neopixel) rather than the simple LED on the Pico.
+
+A little surprisingly, the Arduino core for the Pico is not maintained by the Raspberry Pi people but by [Earle F. Philhower, III](https://github.com/earlephilhower) in his [arduino-pico repo](https://github.com/earlephilhower/arduino-pico/).
+
+Getting setup is described well in this [tutorial](https://randomnerdtutorials.com/programming-raspberry-pi-pico-w-arduino-ide/) from Random Nerd Tutorials. At the step where a board needs to be chosen, I chose the "Waveshare RP2040 Zero".
+
+Then I went to the IDE's _Sketch_ / _Include Library_ / _Manager Libraries_, searched for "neopixel" and installed the one called "Adafruit NeoPixel". I then went to _File_ / _Examples_, scrolled down right to the end of the list, where there's a separate section for custom libraries, selected _Adafruit Neopixel_ / _simple_ and modified that example for the RP2040-Zero to get:
+
+```
+#include <Adafruit_NeoPixel.h>
+#include <cstdint>
+
+namespace {
+  constexpr std::uint16_t NUM_PIXELS = 1;
+  constexpr std::uint16_t PIXEL_PIN = 16;
+
+  using NeoPixel = Adafruit_NeoPixel;
+
+  NeoPixel pixels(NUM_PIXELS, PIXEL_PIN);
+
+  std::uint16_t hue = 0;
+}
+
+void setup() {
+  pixels.begin();
+  pixels.setBrightness(64);
+  pixels.clear();
+}
+
+void loop() {
+  std::uint32_t color = NeoPixel::gamma32(NeoPixel::ColorHSV(hue++));
+
+  pixels.fill(color);
+  pixels.show();
+}
+```
+
+Note: most example include a `delay` call at the end of `loop` but the updating of the neopixel is slow enough that it acts as a throttle on the whole process - even without a delay, it takes about 20 seconds to cycle through the spectrum (at which point `hue` overflows and returns to 0).
+
+To get the board into a state where you can upload a sketch, you have to unplug USB and press the BOOT button on the board, keep it held down while reconnecting USB and then release.
+
+Note: some tutorials seem to suggest that you only need to plug things in and out while holding down the BOOT button as part of uploading your _first_ Arduino sketch but I found it always necessary before uploading a sketch.
+
+By default, the Arduino IDE expects to upload sketches via a serial port so, you have to _Tools_ / _Port_ and select _UF2 Board_.
+
+Then you can upload the sketch to the board (using the normal _Upload_ button). Once the sketch is uploaded, it's automatically reset such that it's no longer in bootloader mode and starts running your program.
+
+Once restarted it appears as a serial device (see below for `udev` rules if using Linux) and you can connect to it using the IDE's serial monitor and use standard Arduino serial calls like:
+
+```
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+  Serial.println("Hello world");
+}
+```
+
+The switching back and forward between UF2 bootloader mode and serial port mode, as you upload sketches and then want to look at their serial output, is a bit inconvenient. The IDE itself is a little confused by this and pops up warnings every so often that e.g. the serial port can't be found.
+
+The first time I used the IDE's _Serial Monitor_, I had to actively go to _Tools_ / _Port_ and manually select the relevant serial port but after that it seemed to correctly flip back and forward between _UF2 Board_ and the appropriate serial device as needed.
+
 SPI pin names
 -------------
 
@@ -76,11 +146,6 @@ Then there's CS, SS and CSn (and even nCS and CSN) which are all valid names for
 
 Finally, there's MISO vs SPI RX and MOSI vs SPI TX - the "MI" is MISO stands for "master input" and the "MO" in MOSI stands for "master output" so, you can see how they can be equated with RX and and TX. However, while understood, using RX and TX seems vanishingly rare in the hobbyist domain and I've no idea why Wavecom uses them in their pinout diagrams for the RP2040-Zero.
 
-Breadboard
-----------
-
-I've soldered the header for pins 9 to 13 of the RP2040-Zero pointing upwards in order to make it possible to plug it into a breadboard. However, if you've only got one RP2040-Zero and plan to solder it to a protoboard then obviously all header should be soldered pointing downward.
-
 nRF24L01+ breadboard adapter
 ----------------------------
 
@@ -95,6 +160,68 @@ The adapter comes with a little capacitor for reducing noise on the power pins b
 If you don't like desoldering SMD components, other stores also carry a version of the board with a thru-hole capacitor, e.g. [here](https://www.aliexpress.com/item/1005002597510818.html).
 
 TODO: of course, you can avoid this issue by buying the nRF24L01+ SMD module where the pins are in a single row (like on the OLED module).
+
+Udev rules
+----------
+
+According to the introduction [section](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html#your-first-binaries) of the Pico documentation (which applies to the RP2040-Zero etc.), you have to hold down the BOOTSEL (labelled BOOT on the RP2040-Zero) while plugging in your USB cable.
+
+Doing so makes no difference to the output seen in `/var/log/syslog`, i.e. you see the same output whether the button is held down or not:
+
+```
+Jun 16 11:45:24 joebloggs-machine kernel: [159291.908184] usb 1-7.4: new full-speed USB device number 96 using xhci_hcd
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.009267] usb 1-7.4: New USB device found, idVendor=2e8a, idProduct=0003, bcdDevice= 1.00
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.009271] usb 1-7.4: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.009273] usb 1-7.4: Product: RP2 Boot
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.009274] usb 1-7.4: Manufacturer: Raspberry Pi
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.009275] usb 1-7.4: SerialNumber: E0C9125B0D9B
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.019963] usb-storage 1-7.4:1.0: USB Mass Storage device detected
+Jun 16 11:45:24 joebloggs-machine kernel: [159292.020414] scsi host4: usb-storage 1-7.4:1.0
+Jun 16 11:45:24 joebloggs-machine mtp-probe: checking bus 1, device 96: "/sys/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7.4"
+Jun 16 11:45:24 joebloggs-machine mtp-probe: bus: 1, device: 96 was not an MTP device
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.025105] scsi 4:0:0:0: Direct-Access     RPI      RP2              3    PQ: 0 ANSI: 2
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.025837] sd 4:0:0:0: Attached scsi generic sg1 type 0
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.026257] sd 4:0:0:0: [sdb] 262144 512-byte logical blocks: (134 MB/128 MiB)
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.026981] sd 4:0:0:0: [sdb] Write Protect is off
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.026987] sd 4:0:0:0: [sdb] Mode Sense: 03 00 00 00
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.028437] sd 4:0:0:0: [sdb] No Caching mode page found
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.028445] sd 4:0:0:0: [sdb] Assuming drive cache: write through
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.037361]  sdb: sdb1
+Jun 16 11:45:25 joebloggs-machine kernel: [159293.037612] sd 4:0:0:0: [sdb] Attached SCSI removable disk
+Jun 16 11:45:25 joebloggs-machine systemd-udevd[525667]: sdb: Process '/usr/bin/unshare -m /usr/bin/snap auto-import --mount=/dev/sdb' failed with exit code 1.
+Jun 16 11:45:27 joebloggs-machine systemd-udevd[525667]: sdb1: Process '/usr/bin/unshare -m /usr/bin/snap auto-import --mount=/dev/sdb1' failed with exit code 1.
+Jun 16 11:45:27 joebloggs-machine udisksd[980]: Mounted /dev/sdb1 at /media/joebloggs/RPI-RP2 on behalf of uid 1000
+```
+
+The two lines about `auto-import` failing with exit code 1 seems to be a long known but harmless `snapd` issue that's covered by issue [1968883](https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1968883).
+
+It seems as if a serial device is only created if the program running on the RP2040 actively requests this functionality (and as far as I can see, the internal Arduino setup logic always does this). To make this port easily accessible (and to tell `mtp-probe` to ignore it):
+
+```
+$ sudo vim /etc/udev/rules.d/50-serial-ports.rules
+```
+
+And add the lines:
+
+```
+# RP2040
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="0003", \
+    SYMLINK+="rp2-boot", MODE="0660", TAG+="uaccess"
+ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="0003", ENV{MTP_NO_PROBE}="1"
+```
+
+When a serial device is created it will be accessible as `/dev/rp2-boot`.
+
+The RP2040 is automatically mounted as a removeable drive called `RPI-RP2` and contains a HTML file that redirects to the [Pico documentation](https://raspberrypi.com/device/RP2?version=E0C9125B0D9B) and an `INFO_UF2.TXT` that provides details of the UF2 bootloader:
+
+```
+$ cat /media/$USER/RPI-RP2/INFO_UF2.TXT
+UF2 Bootloader v3.0
+Model: Raspberry Pi RP2
+Board-ID: RPI-RP2
+```
+
+As this bootloader is in ROM, there's no way to update it.
 
 Waveshare
 ---------
@@ -116,3 +243,5 @@ The Fritzing Waveshare 1.3" OLED part was created by A. Horneffer and was found 
 The Fritzing Waveshare RP2040-Zero part was created by Peter Van Epp and was found [here](https://forum.fritzing.org/t/part-request-waveshare-rp2040-zero/16705/2).
 
 And as already noted above, the main `scannerGraphic.ino` sketch was created by [2bndy](https://github.com/2bndy5).
+
+The pinout diagrams, seen in the main breadboard diagram above, were created using the Fritzing breadboard SVGs for the relevand parts and the template that's linked to and described in this [video](https://youtu.be/ndVs1UvK6AE) by ATMakers on how to create pinout diagrams.
