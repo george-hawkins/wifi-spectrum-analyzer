@@ -141,6 +141,10 @@ Make sure _UF2 Board_ is selected under _Tools_ / _Port_.
 
 Click the _Upload_ button. That's it - the OLED should cycle through various graphics.
 
+| Front | Top | Back |
+|-------|-----|------|
+| ![front](images/oled-breadboard-front.jpg) | ![top](images/oled-breadboard-top.jpg) | ![back](images/oled-breadboard-back.jpg) |
+
 ### Notes
 
 The `OLED_1in3.ino` and related files were extracted from the `OLED_Module_Code.7z` that was downloaded (in June 2024) using the "Sample Program (New)" link in the [_Resources_ section](https://www.waveshare.com/wiki/1.3inch_OLED_(B)#Resources) of the Waveshare wiki page for the 1.3" OLED (B) module.
