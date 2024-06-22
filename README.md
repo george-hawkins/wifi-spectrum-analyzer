@@ -128,6 +128,29 @@ The switching back and forward between UF2 bootloader mode and serial port mode,
 
 The first time I used the IDE's _Serial Monitor_, I had to actively go to _Tools_ / _Port_ and manually select the relevant serial port but after that it seemed to correctly flip back and forward between _UF2 Board_ and the appropriate serial device as needed.
 
+Waveshare OLED
+--------------
+
+In the Arduino, IDE open the `waveshare/OLED_1in3/OLED_1in3.ino` included in this repo.
+
+Make sure "Waveshare RP2040 Zero" is selected as the board.
+
+Hold down the _BOOT_ button, connect to USB, release _BOOT_ button.
+
+Make sure _UF2 Board_ is selected under _Tools_ / _Port_.
+
+Click the _Upload_ button. That's it - the OLED should cycle through various graphics.
+
+### Notes
+
+The `OLED_1in3.ino` and related files were extracted from the `OLED_Module_Code.7z` that was downloaded (in June 2024) using the "Sample Program (New)" link in the [_Resources_ section](https://www.waveshare.com/wiki/1.3inch_OLED_(B)#Resources) of the Waveshare wiki page for the 1.3" OLED (B) module.
+
+However, Waveshare don't seem to have kept this code up-to-date with the SPI libary included in the latest Arduino IDE (and also seem to have relied on a more forgiving version of `gcc`). So, I had to make some minor changes - these can be seen in commit [`688c550`](https://github.com/george-hawkins/wifi-spectrum-analyzer/commit/688c550).
+
+In particular, I switched to the newer approach to setting clock frequency, bit order and SPI mode using `SPISettings`. I set the SPI clock frequency to 8MHz - this is equivalent to the speed that would have been set when using the old `SPI_CLOCK_DIV2` value with a classic 16MHz Arduino UNO.
+
+From reading the datasheet for the SH1106 chip, it should be possible to use far higher speeds (the Pico supports up to 62.5MHz) but 8MHz seems to be a safe upper limit for breadboards (beyond 8MHz you may experience issues due to jumper-wire lengths or characteristics of the breadboard).
+
 SPI pin names
 -------------
 
