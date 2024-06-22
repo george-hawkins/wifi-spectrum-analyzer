@@ -1,5 +1,5 @@
 #include "OLED_Driver.h"
-#include "GUI_paint.h"
+#include "GUI_Paint.h"
 #include "DEV_Config.h"
 #include "Debug.h"
 #include "ImageData.h"
@@ -16,7 +16,7 @@ void setup() {
   UWORD Imagesize = ((OLED_1IN3_WIDTH%8==0)? (OLED_1IN3_WIDTH/8): (OLED_1IN3_WIDTH/8+1)) * OLED_1IN3_HEIGHT;
   if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) { 
       Serial.print("Failed to apply for black memory...\r\n");
-      return -1;
+      std::abort();
   }
   Serial.print("Paint_NewImage\r\n");
   Paint_NewImage(BlackImage, OLED_1IN3_WIDTH, OLED_1IN3_HEIGHT, 90, BLACK);  

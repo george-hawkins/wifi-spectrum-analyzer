@@ -6,6 +6,16 @@
   | function    : Provide the hardware underlying interface
 ******************************************************************************/
 #include "DEV_Config.h"
+#include <cstdint>
+
+#if USE_SPI_4W
+namespace
+{
+  // OLED SPI settings.
+  constexpr std::uint32_t SPI_CLOCK_FREQ = 8'000'000;
+  SPISettings SPI_SETTINGS(SPI_CLOCK_FREQ, MSBFIRST, SPI_MODE3);
+}
+#endif
 
 /********************************************************************************
   function: System Init and exit
@@ -24,10 +34,6 @@ uint8_t System_Init(void)
 
 #if USE_SPI_4W
   Serial.println("USE_SPI");
-  //set OLED SPI
-  SPI.setDataMode(SPI_MODE3);
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);
   SPI.begin();
 
 #elif USE_IIC
@@ -51,7 +57,9 @@ uint8_t System_Init(void)
 ********************************************************************************/
 void SPI4W_Write_Byte(uint8_t DATA)
 {
+  SPI.beginTransaction(SPI_SETTINGS);
   SPI.transfer(DATA);
+  SPI.endTransaction();
 }
 
 void I2C_Write_Byte(uint8_t value, uint8_t Cmd)

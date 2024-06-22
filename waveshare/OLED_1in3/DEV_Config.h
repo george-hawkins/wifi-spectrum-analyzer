@@ -28,7 +28,7 @@
     //Use the  library function definition
 *****************************************************************************************/
 //GPIO config
-#define OLED_CS 10
+#define OLED_CS SS
 #define OLED_CS_0     digitalWrite(OLED_CS, LOW)
 #define OLED_CS_1     digitalWrite(OLED_CS, HIGH)
 
