@@ -108,6 +108,8 @@ To get the board into a state where you can upload a sketch, you have to unplug 
 
 Note: some tutorials seem to suggest that you only need to plug things in and out while holding down the BOOT button as part of uploading your _first_ Arduino sketch but I found it always necessary before uploading a sketch.
 
+**Update:** it's only necessary to hold down the BOOT button if the previous sketch used `Serial`.
+
 By default, the Arduino IDE expects to upload sketches via a serial port so, you have to _Tools_ / _Port_ and select _UF2 Board_.
 
 Then you can upload the sketch to the board (using the normal _Upload_ button). Once the sketch is uploaded, it's automatically reset such that it's no longer in bootloader mode and starts running your program.
@@ -154,6 +156,228 @@ However, Waveshare don't seem to have kept this code up-to-date with the SPI lib
 In particular, I switched to the newer approach to setting clock frequency, bit order and SPI mode using `SPISettings`. I set the SPI clock frequency to 8MHz - this is equivalent to the speed that would have been set when using the old `SPI_CLOCK_DIV2` value with a classic 16MHz Arduino UNO.
 
 From reading the datasheet for the SH1106 chip, it should be possible to use far higher speeds (the Pico supports up to 62.5MHz) but 8MHz seems to be a safe upper limit for breadboards (beyond 8MHz you may experience issues due to jumper-wire lengths or characteristics of the breadboard).
+
+Switching to the Adafruit SH110x library
+----------------------------------------
+
+The driver chip used in the Waveshare and AliExpress OLED modules is the SH1106 (this driver is extremely similar to the SSD1306 chip that's also commonly used, e.g. in this [1.3" OLED](https://www.adafruit.com/product/938) from Adafruit).
+
+The code in the previous section uses the Waveshare's own `OLED_Driver.cpp` driver code. But the [Adafruit_SH110x](https://github.com/adafruit/Adafruit_SH110x) library seems to be more actively maintained and is available via the Arduino IDE's library management feature.
+
+So, let's try switching to it...
+
+First go to _Tools_ / _Manage Libraries_ and search for "sh110x" and install the "Adafruit SH110X" library that's found (selecting _Install all_ rather than _Install without dependencies_).
+
+Then go to _File_ / _Examples_, go down to the section at the bottom for custom libraries and select _Adafruit SH110X_ / _OLED_STPY_SH1106_ / _SH1106_128x64_SPi_QTPY_.
+
+Replace the block of pin number defines with this set that match our breadboard layout:
+
+```
+#define OLED_MOSI     MOSI
+#define OLED_CLK      SCK
+#define OLED_DC       7
+#define OLED_CS       SS
+#define OLED_RST      8
+```
+
+Repeat the steps in the previous section, from making sure the right board type is selected to clicking upload. The resulting demo is more impressive than the Waveshare one.
+
+The compile step produces quite a lot of warnings but they're all about the same kind of thing:
+
+```
+/home/joebloggs/git/wifi-spectrum-analyzer/adafruit/sh1106_128x64_spi/sh1106_128x64_spi.ino:61:14: warning: 'B00110000' is deprecated: use 0b00110000 instead [-Wdeprecated-declarations]
+   61 |   B00000000, B00110000
+      |              ^~~~~~~~~
+```
+
+They're harmless and result from the use of a deprecated `enum` from the days before there was a nice way to write binary literals. If you really want to, you can get rid of these warnings by replacing the `logo16_glcd_bmp` declaration in the `.ino` file with:
+
+```
+static const unsigned char PROGMEM logo16_glcd_bmp[] =
+{ 0b00000000, 0b11000000,
+  0b00000001, 0b11000000,
+  0b00000001, 0b11000000,
+  0b00000011, 0b11100000,
+  0b11110011, 0b11100000,
+  0b11111110, 0b11111000,
+  0b01111110, 0b11111111,
+  0b00110011, 0b10011111,
+  0b00011111, 0b11111100,
+  0b00001101, 0b01110000,
+  0b00011011, 0b10100000,
+  0b00111111, 0b11100000,
+  0b00111111, 0b11110000,
+  0b01111100, 0b11110000,
+  0b01110000, 0b01110000,
+  0b00000000, 0b00110000
+};
+```
+
+nRF24 module
+------------
+
+First temporarily, unplug the red 3.3V wire of the OLED module as the initial demo code that we'll use with the nRF24 module isn't aware that there's a second SPI device and isn't set up to manage the chip select (CS) pins for both devices.
+
+| Front | Top | Back |
+|-------|-----|------|
+| ![front](images/rf24-breadboard-front.jpg) | ![top](images/rf24-breadboard-top.jpg) | ![back](images/rf24-breadboard-back.jpg) |
+
+First go to _Tools_ / _Manage Libraries_ and search for "rf24" and install the "RF24" library from TMRh20 that's found.
+
+Then go to _File_ / _Examples_, go down to the section at the bottom for custom libraries and select _RF24_ / _scanner_.
+
+Replace the `CE` and `CSN` pin number defines with these ones that match our breadboard layout:
+
+```
+#define CE_PIN 28
+#define CSN_PIN 29
+```
+
+Repeat the steps in the _Waveshare OLED_ section, from making sure the right board type is selected to clicking upload. The resulting demo is more impressive than the Waveshare one.
+
+Once the sketch is uploaded, go to _Tools_ / _Port_ and select the serial port (rather than the UF2 port) that corresponds to the board. Then select _Tools_ / _Serial Monitor_.
+
+You should see the following in the serial monitor:
+
+```
+RF24/examples/scanner/
+Select your Data Rate. Enter '1' for 1 Mbps, '2' for 2 Mbps, '3' for 250 kbps. Defaults to 1Mbps.
+```
+
+Just go to the message field and press enter to select the 1Mbps default. It'll then print out a header like this:
+
+```
+***Enter a channel number to emit a constant carrier wave.
+***Enter a negative number to switch back to scanner mode.
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111
+000000000011111111112222222222333333333344444444445555555555666666666677777777778888888888999999999900000000001111111111222222
+012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+Ignore the bit about entering a channel number or a negative number - the default behavior is scanner mode which is what we want.
+
+The header shows that it's split the 2.4GHz band into 126 chunks and it'll then start the displaying the noise level seen for each of those chunks (going from around 2.401 GHz for the 0th chunk to 2.495GHz for the 125th chunk).
+
+Read the vertical columns as chunk numbers going from `000` for the left-most column to `125` for the right-most column:
+
+```
++-- chunk 0                                                                                                          chunk 125
+|                                                                                                                            |
+|                                                                                                                            |
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111
+000000000011111111112222222222333333333344444444445555555555666666666677777777778888888888999999999900000000001111111111222222
+012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+The board will then start scanning the 2.4GHz band and output a line about every four seconds showing how much noise it saw for each chunk. The noise level is shown as a hex value, with 0 shown as a `-`, i.e. no noise, and `F` being maximum noise.
+
+So, we see lines like this:
+
+```
+-12-211111-2----1--1-1----------BBCFCDCC9DD------------------------------1-----1--1-------------------------------------------
+```
+
+Above, there's very little noise across most of the band (values of `-`, `1` and `2`) but then there's a big noisy block of chunks (chunks 32 to 42) where the values are all `9` or above.
+
+I assumed this block corresponded to my Wi-Fi router but turning it off didn't result in any real change in that area - maybe my router is operating in a high-contention area where my neighbors routers are also pumping out energy.
+
+OLED and nRF24 modules
+----------------------
+
+Now, everything is working with the `Adafruit_SH110x` library and the `RF24` library, let's move onto the sketch that combines them both.
+
+First reconnect the red 3.3V wire of the OLED module.
+
+The following steps assumed you've already installed the `Adafruit_SH110x` and `RF24` libraries (as done in the previous sections).
+
+Go to _File_ / _Examples_, go down to the section at the bottom for custom libraries and select _RF24_ / _scannerGraphic_.
+
+First, exactly as before, find and replace the `CE` and `CSN` pin number defines with these ones that match our breadboard layout:
+
+```
+#define CE_PIN 28
+#define CSN_PIN 29
+```
+
+Then scroll down to the section containing the following declarations for `SPI_DISPLAY`:
+
+```
+#include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
+
+#define TFT_CS 9
+#define TFT_RST -1  // Or set to -1 and connect to Arduino RESET pin
+#define TFT_DC 6
+
+#define SCREEN_WIDTH 135   // TFT display width, in pixels
+#define SCREEN_HEIGHT 240  // TFT display height, in pixels
+
+// For 1.14", 1.3", 1.54", 1.69", and 2.0" TFT with ST7789:
+Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+
+#define BLACK ST77XX_BLACK
+#define WHITE ST77XX_WHITE
+```
+
+And change those lines to these ones that match our OLED module and breadboard setup:
+
+```
+#include <Adafruit_SH110X.h>
+
+#define TFT_CS SS
+#define TFT_RST 8
+#define TFT_DC 7
+
+#define SCREEN_WIDTH 128   // TFT display width, in pixels
+#define SCREEN_HEIGHT 64  // TFT display height, in pixels
+
+Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, MOSI, SCK, TFT_DC, TFT_RST, TFT_CS);
+
+#define BLACK SH110X_BLACK
+#define WHITE SH110X_WHITE
+```
+
+Finally, scroll down further and delete all of the following block _except_ for the `#endif` line:
+
+```
+#elif defined(SPI_DISPLAY)
+  // use this initializer for a 1.14" 240x135 TFT:
+  display.init(SCREEN_WIDTH, SCREEN_HEIGHT);  // Init ST7789 240x135
+#endif
+```
+
+Now, repeat the steps in the _Waveshare OLED_ section, from making sure the right board type is selected to clicking upload. The resulting demo is more impressive than the Waveshare one.
+
+TODO
+----
+
+Passing `&SPI` into the `Adafruit_SH1106G` was the crucial bit, without this the underlying `Adafruit_SPIDevice` class thinks the SPI device has been set up for its sole use and doesn't use `SPISettings`, `SPIClass::beginTransaction` and `SPIClass::endTransaction`.
+
+I kept the `#define` names `TFT_CS` etc. even tho' our module is an OLED and not a TFT.
+
+I added the following block at the start of `setup` - it doesn't seem to strictly necessary but it seems to be what's considered best practice, especially when using multiple SPI devices:
+
+```
+pinMode(CSN_PIN, OUTPUT);
+digitalWrite(CSN_PIN, HIGH);
+pinMode(TFT_CS, OUTPUT);
+digitalWrite(TFT_CS, HIGH);
+delay(1);
+SPI.begin()
+```
+
+The above snippet came from reading [this guide](https://dorkbotpdx.org/blog/paul/better_spi_bus_design_in_3_steps/) to "better SPI bus design" and Random Nerd Tutorials' guide to using the ESP32 with [multiple SPI devices](https://dorkbotpdx.org/blog/paul/better_spi_bus_design_in_3_steps/) (we're using a Pico but the same advice applies).
+
+`rf24/scannerGraphic/scannerGraphic.ino` contains the version that's nearest to the original `~/Arduino/libraries/RF24/examples/scannerGraphic/scannerGraphic.ino`.
+
+`rf24/scannerGraphicHack/scannerGraphicHack.ino` hacks in the logic from the original text based scanner code and is a lot less hyperactive.
+
+Sparkfun have a nice overview of SPI [here](https://learn.sparkfun.com/tutorials/serial-peripheral-interface-spi) that covers chip select and using multiple SPI devices.
+
+---
+
+**TODO:** Add in 3.3V regulator.
 
 SPI pin names
 -------------
