@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.6122838"
-     inkscape:cx="69.27154"
+     inkscape:cx="69.379946"
      inkscape:cy="98.541204"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -2469,7 +2469,7 @@
              sodipodi:role="line"
              id="tspan17308-2"
              x="396.39893"
-             y="625.69336">0MIS</tspan></text></g></g><g
+             y="625.69336">0</tspan></text></g></g><g
        id="g4"
        transform="rotate(90,495.98783,642.48234)"><circle
          r="5.2591066"
@@ -2513,7 +2513,7 @@
              sodipodi:role="line"
              id="tspan17308-2-1"
              x="396.39893"
-             y="625.69336">0CSn</tspan></text></g></g><g
+             y="625.69336">1</tspan></text></g></g><g
        id="g4-8"
        transform="rotate(90,443.41201,589.90653)"><circle
          r="5.2591066"
@@ -2601,7 +2601,7 @@
              sodipodi:role="line"
              id="tspan17308-2-0"
              x="396.39893"
-             y="625.69336">0CLK</tspan></text></g></g><g
+             y="625.69336">CLK</tspan></text></g></g><g
        id="g6-6"
        transform="rotate(90,489.0693,634.33958)"><circle
          r="5.2591066"
@@ -2645,7 +2645,7 @@
              sodipodi:role="line"
              id="tspan17308-2-0-5"
              x="396.39893"
-             y="625.69336">0MOS</tspan></text></g></g><g
+             y="625.69336">MOSI</tspan></text></g></g><g
        id="g5-8"
        transform="rotate(90,465.60475,612.82076)"><circle
          r="5.2591066"
@@ -2689,7 +2689,7 @@
              sodipodi:role="line"
              id="tspan17308-2-4"
              x="396.39893"
-             y="625.69336">4</tspan></text></g></g><g
+             y="625.69336">MISO</tspan></text></g></g><g
        id="g4-4"
        transform="rotate(90,465.9655,612.46001)"><circle
          r="5.2591066"
@@ -2733,7 +2733,7 @@
              sodipodi:role="line"
              id="tspan17308-2-1-5"
              x="396.39893"
-             y="625.69336">5</tspan></text></g></g><g
+             y="625.69336">CSn</tspan></text></g></g><g
        id="g6-9"
        transform="rotate(90,466.57762,611.84789)"><circle
          r="5.2591066"
@@ -2860,7 +2860,7 @@
          sodipodi:role="line"
          id="tspan17308-2-1-9"
          x="411.84064"
-         y="676.6004">1CSn</tspan></text><circle
+         y="676.6004">9</tspan></text><circle
        r="5.2591066"
        cy="-657.19141"
        cx="-436.43414"
@@ -2899,7 +2899,7 @@
          sodipodi:role="line"
          id="tspan17308-2-0-1"
          x="411.18192"
-         y="661.49792">1CLK</tspan></text><circle
+         y="661.49792">10</tspan></text><circle
        r="5.2591066"
        cy="-642.13007"
        cx="-436.43414"
@@ -2938,7 +2938,7 @@
          sodipodi:role="line"
          id="tspan17308-2-0-5-2"
          x="411.82053"
-         y="646.43665">1MOS</tspan></text><circle
+         y="646.43665">11</tspan></text><circle
        r="5.2591066"
        cy="-627.06885"
        cx="-436.43414"

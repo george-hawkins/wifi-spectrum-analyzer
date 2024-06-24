@@ -108,7 +108,7 @@ To get the board into a state where you can upload a sketch, you have to unplug 
 
 Note: some tutorials seem to suggest that you only need to plug things in and out while holding down the BOOT button as part of uploading your _first_ Arduino sketch but I found it always necessary before uploading a sketch.
 
-**Update:** it's only necessary to hold down the BOOT button if the previous sketch used `Serial`.
+**Update:** I don't know what determines whether you need to hold down the BOOT button or not. Just pressing the _Upload_ button in the IDE, without the whole thing of holding the BOOT button down and disconnecting/reconnecting USB, often worked but would then occassionally fail for no obvious reason (initially, I thought it was related to whether one had used the serial port, e.g. with `Serial.println("...")`, but that didn't seem to be it).
 
 By default, the Arduino IDE expects to upload sketches via a serial port so, you have to _Tools_ / _Port_ and select _UF2 Board_.
 
@@ -136,6 +136,8 @@ Waveshare OLED
 In the Arduino, IDE open the `waveshare/OLED_1in3/OLED_1in3.ino` included in this repo.
 
 Make sure "Waveshare RP2040 Zero" is selected as the board.
+
+**Important:** I found that if I restarted the IDE, it didn't always remember the board associated with a sketch so, always confirm the board is as expected after restarting the IDE.
 
 Hold down the _BOOT_ button, connect to USB, release _BOOT_ button.
 
@@ -318,6 +320,8 @@ Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 #define BLACK ST77XX_BLACK
 #define WHITE ST77XX_WHITE
+#define REFRESH
+#define CLEAR_DISPLAY ({ display.fillScreen(BLACK); })
 ```
 
 And change those lines to these ones that match our OLED module and breadboard setup:
@@ -325,29 +329,50 @@ And change those lines to these ones that match our OLED module and breadboard s
 ```
 #include <Adafruit_SH110X.h>
 
-#define TFT_CS SS
-#define TFT_RST 8
-#define TFT_DC 7
+#define OLED_CS SS
+#define OLED_RST 8
+#define OLED_DC 7
 
 #define SCREEN_WIDTH 128   // TFT display width, in pixels
 #define SCREEN_HEIGHT 64  // TFT display height, in pixels
 
-Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, MOSI, SCK, TFT_DC, TFT_RST, TFT_CS);
+Adafruit_SH1106G display{SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, OLED_DC, OLED_RST, OLED_CS};
 
 #define BLACK SH110X_BLACK
 #define WHITE SH110X_WHITE
+#define REFRESH ({ display.display(); })
+#define CLEAR_DISPLAY ({ display.clearDisplay(); })
 ```
 
-Finally, scroll down further and delete all of the following block _except_ for the `#endif` line:
+Finally, scroll down further to the following lines:
 
 ```
-#elif defined(SPI_DISPLAY)
-  // use this initializer for a 1.14" 240x135 TFT:
-  display.init(SCREEN_WIDTH, SCREEN_HEIGHT);  // Init ST7789 240x135
-#endif
+// use this initializer for a 1.14" 240x135 TFT:
+display.init(SCREEN_WIDTH, SCREEN_HEIGHT);  // Init ST7789 240x135
 ```
+
+And replace them with:
+
+```
+display.begin(0, true);
+```
+
+That's all the code changes completed.
 
 Now, repeat the steps in the _Waveshare OLED_ section, from making sure the right board type is selected to clicking upload. The resulting demo is more impressive than the Waveshare one.
+
+Improving scannerGraphic.ino
+----------------------------
+
+The initial output is a little disappointing. The main reason for this is that the noise values are highly quantized - the height of the display is 64 pixels and after you take into account the space taken by the x-axis and its 0 and 125 labels, there's a little over 50 pixels left for the bars that display the noise seen in each of the 126 chunks that the band has been split into. However, the underlying noise values only go from 0 to 4 and are scaled up to fit the ~50 pixels - this results in a very stepwise output.
+
+So, I updated the code to use a similar approach to the original `scanner.ino` where the value for each chunk is the result of the most recent 100 samples (rather than 4) and the value is then clamped at 16, i.e. a bar displayed on the OLED will be at its maximum if 16 or more of the underlying samples for the given chuck detected noise.
+
+You'll also notice little dots that get left behind after a bar's value decreases, these little _peak_ markers gradually decay down to the current value. In the original code the decay was so fast that the peak markers were barely visible before they'd decayed to the current value.
+
+So, I also updated the decay logic to allow the decay to be slower - this involved a little more than increasing the multiplier used in the original code as that approach immediately hits overflow issues.
+
+The resulting sketch can be found in [`rf24/scannerGraphic/scannerGraphic.ino`](rf24/scannerGraphic/scannerGraphic.ino).
 
 SPI issues
 ----------
