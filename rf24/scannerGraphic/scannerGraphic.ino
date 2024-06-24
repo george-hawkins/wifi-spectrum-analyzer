@@ -37,6 +37,7 @@
  */
 #include <Adafruit_GFX.h>  // dependency of Adafruit display libraries
 #include "RF24.h"
+#include <bitset>
 
 /********************************************************************
  * CHOOSE A DISPLAY INTERFACE
@@ -72,33 +73,42 @@ const uint8_t numChannels = 126;  // 0-125 are supported
  * Declare caching mechanism to track history of signals for peak decay
  **********************************************************************/
 
-const uint8_t cacheMax = 4;
+constexpr std::size_t MAX_SAMPLES{100};
+constexpr std::size_t DECAY_MULTIPLIER{16}; // Allow for n-step decays.
+constexpr std::size_t CLAMP_MAX{0x0F};
+constexpr std::uint8_t SCALAR_MARKS{4};
 
 /// A data structure to organize the cache of signals for a certain channel.
 struct ChannelHistory {
-  /// max peak value is (at most) 2 * CACHE_MAX to allow for half-step decays
-  uint8_t maxPeak = 0;
-
   /// Push a signal's value into cached history while popping
   /// oldest cached value. This also sets the maxPeak value.
   /// @returns The sum of signals found in the cached history
-  uint8_t push(bool value) {
-    uint8_t sum = value;
-    for (uint8_t i = 0; i < cacheMax - 1; ++i) {
-      history[i] = history[i + 1];
-      sum += history[i];
-    }
-    history[cacheMax - 1] = value;
-    maxPeak = max(sum * 2, maxPeak);  // sum * 2 to allow half-step decay
+  std::size_t push(std::size_t pos, bool value) {
+    samples[pos] = value;
+
+    std::size_t sum = samples.count();
+    maxPeak = max(sum * DECAY_MULTIPLIER, maxPeak);
     return sum;
   }
 
+  void decMaxPeak() {
+    if (maxPeak > 0) {
+      --maxPeak;
+    }
+  }
+
+  std::size_t getMaxPeak() const {
+    return maxPeak / DECAY_MULTIPLIER;
+  }
+
 private:
-  bool history[cacheMax] = { 0 };
+  std::size_t maxPeak = 0;
+  std::bitset<MAX_SAMPLES> samples;
 };
 
 /// An array of caches to use as channels' history
 ChannelHistory stored[numChannels];
+std::size_t samplePos = 0;
 
 /********************************************************************
  * Instantiate the appropriate display objects according to the
@@ -245,27 +255,34 @@ void setup(void) {
  * Make the app loop forever
  ********************************************************************/
 void loop(void) {
-  // Print out channel measurements, clamped to a single hex digit
   for (uint8_t channel = 0; channel < numChannels; ++channel) {
     bool foundSignal = scanChannel(channel);
-    uint8_t cacheSum = stored[channel].push(foundSignal);
-    uint8_t x = (barWidth * channel) + 1 + margin - (barWidth * (bool)channel);
+    std::size_t cacheSum = stored[channel].push(samplePos, foundSignal);
+
+    std::int16_t x = (barWidth * channel) + 1 + margin - (barWidth * (bool)channel);
     // reset bar for current channel to 0
     display.fillRect(x, 0, barWidth, chartHeight, BLACK);
-    if (stored[channel].maxPeak > cacheSum * 2) {
+
+    std::size_t clampedSum = std::min(CLAMP_MAX, cacheSum);
+    std::size_t clampedMaxPeak = std::min(CLAMP_MAX, stored[channel].getMaxPeak());
+
+    if (clampedMaxPeak > clampedSum) {
       // draw a peak line only if it is greater than current sum of cached signal counts
-      uint16_t y = chartHeight - (chartHeight * stored[channel].maxPeak / (cacheMax * 2));
+      std::int16_t y = chartHeight - (chartHeight * clampedMaxPeak / CLAMP_MAX);
       display.drawLine(x, y, x + barWidth, y, WHITE);
 #ifndef HOLD_PEAKS
-      stored[channel].maxPeak -= 1;  // decrement max peak
+      stored[channel].decMaxPeak();  // decrement max peak
 #endif
     }
-    if (cacheSum) {  // draw the cached signal count
-      uint8_t barHeight = chartHeight * cacheSum / cacheMax;
+    if (clampedSum > 0) {  // draw the cached signal count
+      std::int16_t barHeight = chartHeight * clampedSum / CLAMP_MAX;
       display.fillRect(x, chartHeight - barHeight, barWidth, barHeight, WHITE);
     }
   }
+
   REFRESH;
+
+  samplePos = (samplePos + 1) % MAX_SAMPLES;
 }  // end loop()
 
 /// Scan a specified channel and return the resulting flag
@@ -296,8 +313,8 @@ void displayChartAxis() {
   display.drawLine(chartWidth - margin, SCREEN_HEIGHT, chartWidth - margin, chartHeight - 2, WHITE);
 
   // draw scalar marks
-  for (uint8_t i = 0; i < cacheMax; ++i) {
-    uint8_t scalarHeight = chartHeight * i / cacheMax;
+  for (uint8_t i = 0; i < SCALAR_MARKS; ++i) {
+    uint8_t scalarHeight = chartHeight * i / SCALAR_MARKS;
     display.drawLine(0, scalarHeight, chartWidth, scalarHeight, WHITE);
   }
 
