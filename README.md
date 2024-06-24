@@ -5,7 +5,7 @@ First off, the cheapest readily available device, that I found, that can handle 
 
 The DIY setup described below may not really be a spectrum analyzer but it can help find the clearest part of the 2.4GHz band - a task for which one would normally otherwise need a spectrum analyzer.
 
-![breadboard](images/breadboard-no-3v3.png)
+![breadboard](images/breadboard-no-3v3.jpg)
 
 Note: the display looks very blurry in the photo above, this is just an issue with my photography - the OLED display is very crisp in reality.
 
@@ -405,14 +405,16 @@ I found these following guides useful in getting to know SPI:
 * The Random Nerd Tutorials' [ESP32 SPI Communication (Arduino IDE)](https://randomnerdtutorials.com/esp32-spi-communication-arduino/#multiple-spi-peripherals) which covers multiple devices on the same SPI bus or using multiple SPI buses (while this tutorial is about the ESP32, things are very similar for the Pico - it too has two SPI buses).
 * Paul at Dorkbot PDX's [guide to _Better SPI Bus Design_](https://dorkbotpdx.org/blog/paul/better_spi_bus_design_in_3_steps/) - I confirmed that the `RF24` and `Adafruit_SH110x` libraries were correctly setting the pin mode and state for their respective chip-select pins as described in step 1 of this guide.
 
-TODO
-----
+3.3V regulator
+--------------
 
-`rf24/scannerGraphic/scannerGraphic.ino` contains the version that's nearest to the original `~/Arduino/libraries/RF24/examples/scannerGraphic/scannerGraphic.ino`.
+Adding in the 3.3V regulator _should_ reduce the noise from the rest of the circuit that would otherwise affect the nRF24 module.
 
-`rf24/scannerGraphicHack/scannerGraphicHack.ino` hacks in the logic from the original text based scanner code and is a lot less hyperactive.
+I'm fairly unconvinced that it makes much of a difference for this setup and adding it introduces an annoying bright red LED into the circuit.
 
-**TODO:** Add in 3.3V regulator.
+But if you do add it, it's easy enough as shown in the following picture. First connect the 5V pin of the Pico to the Vin pin of the regulator and connect the regulator's GND pin to the same ground as the rest of the circuit. Then 3V3 and GND pin of the nRF24 module to the Vout and GND pins of the the regulator respectively.
+
+![regulator](images/regulator.jpg)
 
 SPI pin names
 -------------
