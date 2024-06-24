@@ -131,14 +131,14 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #include <Adafruit_SH110X.h>
 
-#define TFT_CS SS
-#define TFT_RST 8
-#define TFT_DC 7
+#define OLED_CS SS
+#define OLED_RST 8
+#define OLED_DC 7
 
 #define SCREEN_WIDTH 128   // TFT display width, in pixels
 #define SCREEN_HEIGHT 64  // TFT display height, in pixels
 
-Adafruit_SH1106G display{SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, TFT_DC, TFT_RST, TFT_CS};
+Adafruit_SH1106G display{SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, OLED_DC, OLED_RST, OLED_CS};
 
 #define BLACK SH110X_BLACK
 #define WHITE SH110X_WHITE
@@ -168,13 +168,6 @@ const uint16_t chartWidth = margin * 2 + (numChannels * barWidth);
  * Setup the app
  ********************************************************************/
 void setup(void) {
-  pinMode(CSN_PIN, OUTPUT);
-  digitalWrite(CSN_PIN, HIGH);
-  pinMode(TFT_CS, OUTPUT);
-  digitalWrite(TFT_CS, HIGH);
-  delay(1);
-  SPI.begin();
-
 #ifdef DEBUGGING
   // Print preamble
   Serial.begin(115200);
