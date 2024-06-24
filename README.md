@@ -5,9 +5,13 @@ First off, the cheapest readily available device, that I found, that can handle 
 
 The DIY setup described below may not really be a spectrum analyzer but it can help find the clearest part of the 2.4GHz band - a task for which one would normally otherwise need a spectrum analyzer.
 
-The parts, including shipping, come to around US$10.
+![breadboard](images/breadboard-no-3v3.png)
 
-While I came up with the particular hardware selection below, all the real work was done by [2bndy](https://github.com/2bndy5) who wrote the [`scannerGraphic.ino`](https://github.com/nRF24/RF24/commits/master/examples/scannerGraphic/scannerGraphic.ino) example that's part of the Arduino [RF24 library](https://github.com/nRF24/RF24).
+Note: the display looks very blurry in the photo above, this is just an issue with my photography - the OLED display is very crisp in reality.
+
+The parts list below, including shipping, come to around US$10.
+
+While I came up with the particular hardware selection below, most of the credit should go to [2bndy](https://github.com/2bndy5) who wrote the [`scannerGraphic.ino`](https://github.com/nRF24/RF24/commits/master/examples/scannerGraphic/scannerGraphic.ino) example that's part of the Arduino [RF24 library](https://github.com/nRF24/RF24).
 
 Parts:
 
