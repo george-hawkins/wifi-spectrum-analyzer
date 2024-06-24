@@ -349,33 +349,39 @@ Finally, scroll down further and delete all of the following block _except_ for 
 
 Now, repeat the steps in the _Waveshare OLED_ section, from making sure the right board type is selected to clicking upload. The resulting demo is more impressive than the Waveshare one.
 
+SPI issues
+----------
+
+If you're using more than one SPI device then the SPI code should be using the modern `SPISettings`, `SPIClass::beginTransaction` and `SPIClass::endTransaction` to manage taking control of the SPI bus.
+
+The `RF24` library does this by default but if you just pass pin numbers, rather than a pointer to an SPI device, then the `Adafruit_SH110x` library seems to assume that it has sole ownership of the SPI bus and does not use the transaction calls:
+
+```
+Adafruit_SH1106G display{SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RST, OLED_CS};
+                                                      ^^^^^^^^^^^^^^^^^^^
+```
+
+If you want it to use the transaction calls then you have to pass it a pointer to an SPI device like so instead:
+
+```
+Adafruit_SH1106G display{SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, OLED_DC, OLED_RST, OLED_CS};
+                                                      ^^^^
+```
+
+It took working out this non-obvious difference to get the RF24 and OLED modules working properly together.
+
+I found these following guides useful in getting to know SPI:
+
+* The Sparkfun [_Serial Peripheral Interface (SPI)_ guide](https://learn.sparkfun.com/tutorials/serial-peripheral-interface-spi) which covers all the basics including chip select and using multiple SPI devices.
+* The Random Nerd Tutorials' [ESP32 SPI Communication (Arduino IDE)](https://randomnerdtutorials.com/esp32-spi-communication-arduino/#multiple-spi-peripherals) which covers multiple devices on the same SPI bus or using multiple SPI buses (while this tutorial is about the ESP32, things are very similar for the Pico - it too has two SPI buses).
+* Paul at Dorkbot PDX's [guide to _Better SPI Bus Design_](https://dorkbotpdx.org/blog/paul/better_spi_bus_design_in_3_steps/) - I confirmed that the `RF24` and `Adafruit_SH110x` libraries were correctly setting the pin mode and state for their respective chip-select pins as described in step 1 of this guide.
+
 TODO
 ----
-
-Passing `&SPI` into the `Adafruit_SH1106G` was the crucial bit, without this the underlying `Adafruit_SPIDevice` class thinks the SPI device has been set up for its sole use and doesn't use `SPISettings`, `SPIClass::beginTransaction` and `SPIClass::endTransaction`.
-
-I kept the `#define` names `TFT_CS` etc. even tho' our module is an OLED and not a TFT.
-
-I added the following block at the start of `setup` - it doesn't seem to strictly necessary but it seems to be what's considered best practice, especially when using multiple SPI devices:
-
-```
-pinMode(CSN_PIN, OUTPUT);
-digitalWrite(CSN_PIN, HIGH);
-pinMode(TFT_CS, OUTPUT);
-digitalWrite(TFT_CS, HIGH);
-delay(1);
-SPI.begin()
-```
-
-The above snippet came from reading [this guide](https://dorkbotpdx.org/blog/paul/better_spi_bus_design_in_3_steps/) to "better SPI bus design" and Random Nerd Tutorials' guide to using the ESP32 with [multiple SPI devices](https://dorkbotpdx.org/blog/paul/better_spi_bus_design_in_3_steps/) (we're using a Pico but the same advice applies).
 
 `rf24/scannerGraphic/scannerGraphic.ino` contains the version that's nearest to the original `~/Arduino/libraries/RF24/examples/scannerGraphic/scannerGraphic.ino`.
 
 `rf24/scannerGraphicHack/scannerGraphicHack.ino` hacks in the logic from the original text based scanner code and is a lot less hyperactive.
-
-Sparkfun have a nice overview of SPI [here](https://learn.sparkfun.com/tutorials/serial-peripheral-interface-spi) that covers chip select and using multiple SPI devices.
-
----
 
 **TODO:** Add in 3.3V regulator.
 
