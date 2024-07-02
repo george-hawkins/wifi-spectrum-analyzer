@@ -57,8 +57,8 @@
  * Instantiate the radio and app-specific attributes
  ********************************************************************/
 
-#define CE_PIN 28
-#define CSN_PIN 29
+#define CE_PIN 6
+#define CSN_PIN SS
 // instantiate an object for the nRF24L01 transceiver
 RF24 radio(CE_PIN, CSN_PIN);
 
@@ -141,8 +141,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #include <Adafruit_SH110X.h>
 
-#define OLED_CS SS
-#define OLED_RST 8
+#define OLED_CS 8
+#define OLED_RST 14
 #define OLED_DC 7
 
 #define SCREEN_WIDTH 128   // TFT display width, in pixels

@@ -110,6 +110,8 @@ Note: most example include a `delay` call at the end of `loop` but the updating 
 
 To get the board into a state where you can upload a sketch, you have to unplug USB and press the BOOT button on the board, keep it held down while reconnecting USB and then release.
 
+**Update:** I don't know if it's ever necessary to disconnect and reconnect USB - hold down the BOOT button, press and release the RESET button and then release the BOOT button seems to do just as good.
+
 Note: some tutorials seem to suggest that you only need to plug things in and out while holding down the BOOT button as part of uploading your _first_ Arduino sketch but I found it always necessary before uploading a sketch.
 
 **Update:** I don't know what determines whether you need to hold down the BOOT button or not. Just pressing the _Upload_ button in the IDE, without the whole thing of holding the BOOT button down and disconnecting/reconnecting USB, often worked but would then occassionally fail for no obvious reason (initially, I thought it was related to whether one had used the serial port, e.g. with `Serial.println("...")`, but that didn't seem to be it).
