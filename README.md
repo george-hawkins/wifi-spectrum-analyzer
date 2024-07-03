@@ -53,6 +53,33 @@ An obvious first upgrade would be to use a larger 320x240 screen like the 2" and
 
 The sketch has nice features, e.g. the max values seen across the spectrum are decayed over time so, the impact of intermittent events isn't immediately lost.
 
+nRF24 modules
+-------------
+
+nRF24 modules come in various forms:
+
+![nRF24 modules](images/nrf24-modules.jpg)
+
+The two on the left have just one chip, the nRF24 chip itself, while the three on the left have an additional PA+LNA chip.
+
+The module second from the left is probably the most popular nRF24 module. However, it's lack of a PA+LNA chip means it has very limited range. The left-most module is just a newer variant of this with an SMD oscillator rather than the large thru hole one of the original version. Both of these modules have a PCB antenna.
+
+A PA+LNA chip has a power amplifier (PA) that increases the transmitting power and low noise amplifier (LNA) that improves receiving sensitivity and together they substantially increase the range of such modules.
+
+The PA+LNA chip is typically a [Skyworks Solutions RFX2401C](https://www.lcsc.com/product-detail/RF-Transceiver-ICs_Skyworks-Solutions_RFX2401C_Skyworks-Solutions-RFX2401C_C19213.html) or its Chinese clone, the [Zhongkewei AT2401C](https://www.lcsc.com/product-detail/RF-Front-End-Circuits_ZHONGKEWEI-AT2401C_C783588.html).
+
+The module in the middle with the screw-on whip antenna is the most popular nRF24 module that comes with a PA+LNA chip.
+
+The module to its right is a more compact version with a u.FL connector for an external antenna.
+
+And the right-most module is similar but, as well as the u.FL connector, it has a PCB antenna.
+
+Note that the left-most module and the one second from the right only have castellated 1 mm pitch holes which are great if you're planning a production run where a [pick-and-place machine](https://en.wikipedia.org/wiki/Pick-and-place_machine) will do the hard work. But for hobbyist use, they're hard to work with and should be avoided in favor of the ones with the more normal 2.54 mm pitch holes.
+
+Initially, I thought a module without a PA+LNA chip might be OK for this project (there's no transmitting involved so, the PA part adds nothing). I tried the module second from the left but found it nearly useless - it detected no noise unless it was right next to a noise source.
+
+So, then I tried the middle module and the left-most module and found that for this project there was little noticeable difference between the two. The large screw-on whip antenna didn't seem better than the other module's PCB antenna for this particular purpose. So, in the end, I went with the more compact of the two.
+
 Breadboard
 ----------
 
