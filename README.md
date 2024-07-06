@@ -13,7 +13,10 @@ The parts list below, including shipping, come to around US$10.
 
 While I came up with the particular hardware selection below, most of the credit should go to [2bndy](https://github.com/2bndy5) who wrote the [`scannerGraphic.ino`](https://github.com/nRF24/RF24/commits/master/examples/scannerGraphic/scannerGraphic.ino) example that's part of the Arduino [RF24 library](https://github.com/nRF24/RF24).
 
-Parts:
+Parts
+-----
+
+![parts](images/parts.jpg)
 
 * [nRF24L01+ GT-24 module](https://www.aliexpress.com/item/32330779943.html)
 * [RP2040-Zero](https://www.aliexpress.com/item/1005004967926448.html)
@@ -23,7 +26,7 @@ Parts:
 
 You can versions of the GT-24 module and the RP2040-Zero with or without header already soldered. In the case of the GT-24 module, I suggest you get the pre-soldered version, to save yourself having to do it but for the RP2040-Zero, I suggest not getting the presolder version if you want to experiment with it first using a breadboard as the presoldered header across the top of the board will prevent it being inserted across the channel running down the middle of the breadboard.
 
-If you don't already have additional header, the same store, has [1x40 pin header](https://www.aliexpress.com/item/32402348546.html).
+It's not required for the setup described below, but if you think you might need additional header, the same store, has [1x40 pin header](https://www.aliexpress.com/item/32402348546.html).
 
 I sometimes want to use this setup on-the-go. If you already have a powerbank, this is the obvious easy solution for powering things in this situation. An alternative is to plug together a USB OTG setup and power it from your smartphone. For this, you'll need:
 
