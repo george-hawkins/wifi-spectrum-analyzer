@@ -5,9 +5,9 @@ First off, the cheapest readily available device, that I found, that can handle 
 
 The DIY setup described below may not really be a spectrum analyzer but it can help find the clearest part of the 2.4GHz band - a task for which one would normally otherwise need a spectrum analyzer.
 
-![breadboard](images/breadboard-no-3v3.jpg)
+![breadboard](images/breadboard.jpg)
 
-Note: the display looks very blurry in the photo above, this is just an issue with my photography - the OLED display is very crisp in reality.
+Note: the display looks very blurry in the photo above, this is just an issue with my photography - the OLED display is very crisp in reality. The pixels that you can see a little above some of the bars mark recently reached peaks.
 
 The parts list below, including shipping, come to around US$10.
 
@@ -15,11 +15,13 @@ While I came up with the particular hardware selection below, most of the credit
 
 Parts:
 
-* [nRF24L01+ DIP module](https://www.aliexpress.com/item/32330779943.html)
-* [RP2040-Zero](https://www.aliexpress.com/item/1005004967926448.html) (buy the one with the header already soldered to save yourself time later).
+* [nRF24L01+ GT-24 module](https://www.aliexpress.com/item/32330779943.html)
+* [RP2040-Zero](https://www.aliexpress.com/item/1005004967926448.html)
 * [128x64 1.3" white OLED module](https://www.aliexpress.com/item/1005003484018034.html)
 * [3.3V voltage regulator](https://www.aliexpress.com/item/32464952488.html)
 * [4x6cm protoboard](https://www.aliexpress.com/item/32864559799.html)
+
+You can versions of the GT-24 module and the RP2040-Zero with or without header already soldered. In the case of the GT-24 module, I suggest you get the pre-soldered version, to save yourself having to do it but for the RP2040-Zero, I suggest not getting the presolder version if you want to experiment with it first using a breadboard as the presoldered header across the top of the board will prevent it being inserted across the channel running down the middle of the breadboard.
 
 If you don't already have additional header, the same store, has [1x40 pin header](https://www.aliexpress.com/item/32402348546.html).
 
@@ -29,6 +31,8 @@ I sometimes want to use this setup on-the-go. If you already have a powerbank, t
 * A [USB-A female to USB-C male OTG adapter](https://www.aliexpress.com/item/32830129548.html) (this page lists different variants, the cheap "USB2.0 TypeC to USB" one is fine).
 
 It feels odd that such a cable combination costs almost as much as the total for all the other parts.
+
+If you're unfamiliar with OTG, it reverses the normal relationship between a smartphone and whatever is plugged into it - normally, a smartphone expects to receive power via USB but an OTG adapter tells it to instead supply power to the thing that it's connect to.
 
 Note: instead of USB-A to USB-C cable plus an OTG adapter you can apparently use a USB C2C cable (see the RP2040-Zero [FAQ](https://www.waveshare.com/wiki/RP2040-Zero#FAQ)) but currently it's not particularly easy to find cables that are clearly labelled as supporting C2C.
 
