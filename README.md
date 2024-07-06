@@ -96,9 +96,11 @@ Breadboard
 
 As well as the breadboard layout of the various parts, the diagram above also includes larger views of the pinouts for the RP2040-Zero, OLED module and nRF module in order to make the SPI pins involved clearer.
 
-**Warning:** different SPI OLED modules will have the same set of seven pins but there's no consistency in the order of these pins - I've shown the pinouts for both the [Waveshare 1.3" OLED (variant B)](https://www.waveshare.com/1.3inch-OLED-B.htm) and for the OLED module from AliExpress (that's linked to above).
+**Warning:** different SPI OLED modules will have the same set of seven pins but there's no consistency in the order of these pins - I've shown the pinout for the OLED module from AliExpress (that's linked to above).
 
-I've soldered the header for pins 9 to 13 of the RP2040-Zero pointing upwards in order to make it possible to plug it into a breadboard. However, if you've only got one RP2040-Zero and plan to solder it to a protoboard then obviously all header should be soldered pointing downward.
+In commit `d8d6967`, I show the pinout for the [Waveshare 1.3" OLED (variant B)](https://www.waveshare.com/1.3inch-OLED-B.htm).
+
+I've soldered the header for pins 9 to 13 of the RP2040-Zero pointing upwards in order to make it possible to plug it into a breadboard. However, if you've only got one RP2040-Zero and plan to solder it to a protoboard then there's no need to solder header to pins 9 to 13 as they're not used for this setup.
 
 RP2040-Zero blink LED
 ---------------------
