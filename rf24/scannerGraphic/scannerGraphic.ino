@@ -97,8 +97,14 @@ struct ChannelHistory {
     }
   }
 
-  std::size_t getMaxPeak() const {
-    return maxPeak / DECAY_MULTIPLIER;
+  std::int16_t getMaxPeakHeight(std::uint16_t chartHeight) const {
+    constexpr std::size_t MULTIPLIER = CLAMP_MAX * DECAY_MULTIPLIER;
+    std::size_t clampedMaxPeak = std::min(MULTIPLIER, maxPeak);
+    std::int32_t maxPeakHeight = chartHeight * clampedMaxPeak;
+
+    maxPeakHeight /= MULTIPLIER;
+
+    return static_cast<std::int16_t>(maxPeakHeight);
   }
 
 private:
@@ -199,6 +205,8 @@ void setup(void) {
   display.begin(0, true);
 #endif
 
+  display.setRotation(2); // Rotate 180 degrees.
+
   // Clear the buffer
   CLEAR_DISPLAY;
 
@@ -264,19 +272,20 @@ void loop(void) {
     display.fillRect(x, 0, barWidth, chartHeight, BLACK);
 
     std::size_t clampedSum = std::min(CLAMP_MAX, cacheSum);
-    std::size_t clampedMaxPeak = std::min(CLAMP_MAX, stored[channel].getMaxPeak());
+    std::int16_t sumHeight = chartHeight * clampedSum / CLAMP_MAX;
 
-    if (clampedMaxPeak > clampedSum) {
+    std::int16_t maxPeakHeight = stored[channel].getMaxPeakHeight(chartHeight);
+
+    if (maxPeakHeight > sumHeight) {
       // draw a peak line only if it is greater than current sum of cached signal counts
-      std::int16_t y = chartHeight - (chartHeight * clampedMaxPeak / CLAMP_MAX);
+      std::int16_t y = chartHeight - maxPeakHeight;
       display.drawLine(x, y, x + barWidth, y, WHITE);
 #ifndef HOLD_PEAKS
       stored[channel].decMaxPeak();  // decrement max peak
 #endif
     }
-    if (clampedSum > 0) {  // draw the cached signal count
-      std::int16_t barHeight = chartHeight * clampedSum / CLAMP_MAX;
-      display.fillRect(x, chartHeight - barHeight, barWidth, barHeight, WHITE);
+    if (sumHeight > 0) {  // draw the cached signal count
+      display.fillRect(x, chartHeight - sumHeight, barWidth, sumHeight, WHITE);
     }
   }
 

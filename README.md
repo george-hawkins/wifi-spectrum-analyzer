@@ -30,6 +30,8 @@ I sometimes want to use this setup on-the-go. If you already have a powerbank, t
 
 It feels odd that such a cable combination costs almost as much as the total for all the other parts.
 
+Note: instead of USB-A to USB-C cable plus an OTG adapter you can apparently use a USB C2C cable (see the RP2040-Zero [FAQ](https://www.waveshare.com/wiki/RP2040-Zero#FAQ)) but currently it's not particularly easy to find cables that are clearly labelled as supporting C2C.
+
 TODO:
 
 * Is the SMD module more convenient than the DIP one.
@@ -406,6 +408,19 @@ You'll also notice little dots that get left behind after a bar's value decrease
 So, I also updated the decay logic to allow the decay to be slower - this involved a little more than increasing the multiplier used in the original code as that approach immediately hits overflow issues.
 
 The resulting sketch can be found in [`rf24/scannerGraphic/scannerGraphic.ino`](rf24/scannerGraphic/scannerGraphic.ino).
+
+OLED rotation
+-------------
+
+Depending on how you mount the OLED you may or may not want apply a rotation to how things are displayed on it.
+
+I've added the following line to the sketch to rotate things by 180&deg;:
+
+```
+display.setRotation(2);
+```
+
+If you don't want things rotated then remove this line.
 
 SPI issues
 ----------
