@@ -102,6 +102,13 @@ In commit `d8d6967`, I show the pinout for the [Waveshare 1.3" OLED (variant B)]
 
 I've soldered the header for pins 9 to 13 of the RP2040-Zero pointing upwards in order to make it possible to plug it into a breadboard. However, if you've only got one RP2040-Zero and plan to solder it to a protoboard then there's no need to solder header to pins 9 to 13 as they're not used for this setup.
 
+Protoboard
+----------
+
+| Top | Bottom |
+|-----|--------|
+| ![top](images/protoboard-top.png) | ![bottom](images/protoboard-bottom.png) |
+
 RP2040-Zero blink LED
 ---------------------
 
