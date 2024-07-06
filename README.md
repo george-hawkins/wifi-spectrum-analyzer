@@ -7,6 +7,8 @@ The DIY setup described below may not really be a spectrum analyzer but it can h
 
 ![breadboard](images/breadboard.jpg)
 
+TODO: two photos of protoboard - 1. powered by normal USB, 2. by OTG and smartphone.
+
 Note: the display looks very blurry in the photo above, this is just an issue with my photography - the OLED display is very crisp in reality. The pixels that you can see a little above some of the bars mark recently reached peaks.
 
 The parts list below, including shipping, come to around US$10.
