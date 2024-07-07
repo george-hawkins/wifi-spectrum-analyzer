@@ -111,6 +111,10 @@ Protoboard
 |-----|--------|
 | ![top](images/protoboard-top.png) | ![bottom](images/protoboard-bottom.png) |
 
+| Top | Parts | Blobs | Bottom |
+|-----|-------|-------|--------|
+| ![top](images/protoboard/top.jpg) | ![parts](images/protoboard/parts.jpg) | ![blobs](images/protoboard/blobs.jpg) | ![bottom](images/protoboard/bottom.jpg) |
+
 RP2040-Zero blink LED
 ---------------------
 
