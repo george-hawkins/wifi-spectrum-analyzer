@@ -115,6 +115,48 @@ Protoboard
 |-----|-------|-------|--------|
 | ![top](images/protoboard/top.jpg) | ![parts](images/protoboard/parts.jpg) | ![blobs](images/protoboard/blobs.jpg) | ![bottom](images/protoboard/bottom.jpg) |
 
+PCB
+---
+
+I ordered PCBs from JLCPCB and PCBWay - the results were near identical, as far as I could see, and both shipped very quickly (within a week from China to Switzerland).
+
+JLCPCB:
+
+| Packaging | Front and back |
+|-----|--------|
+| ![JLCPCB packaging](images/pcb/jlcpcb-packaging.jpg) | ![JLCPCB front and back](images/pcb/jlcpcb-front-and-back.jpg) |
+
+PCBWay:
+
+| Packaging | Front and back |
+|-----|--------|
+| ![PCBWay packaging](images/pcb/pcbway-packaging.jpg) | ![PCBWay front and back](images/pcb/pcbway-front-and-back.jpg) |
+
+PCBWay (top) and JLCPCB (bottom) comparent (unfortunately, the picture quality isn't really good enough for a very useful comparison):
+
+![JLCPCB and PCBWay compared](images/pcb/compared.jpg)
+
+PCB and parts:
+
+![PCB and parts](images/pcb/parts.jpg)
+
+Soldered together and powered up (after uploading sketch):
+
+![Soldered and powered](images/pcb/powered.jpg)
+
+Powered from my smartphone using a USB OTG adapter (and a standard USB-C to USB-A cable):
+
+![OTG powered](images/pcb/otg-powered.jpg)
+
+I used [EasyEDA](https://easyeda.com/) to design the PCB, the process was extremely easy and you can find my notes on it in [`easyeda.md`](easyeda.md) and a backup of the finished project in [`easyeda-project-backup.zip`](easyeda-project-backup.zip) that can be loaded back into EasyEDA.
+
+I don't go out of my way to create nice schematic symbols for the parts so the schematic looks rather crowded with lots of overlapping text. I used lots of _net ports_ which I've since heard is typical of beginner designs - there's nothing really wrong with them but more experienced designers favor making connections where possible and only using _net ports_ if the design becomes large enough that it needs to be split into separate areas.
+
+| Schematic | PCB bottom | PCB top and silkscreen | 3D view |
+|-----------|------------|------------------------|---------|
+| ![schematic](images/easyeda/schematic.png) | ![PCB bottom](images/easyeda/pcb-bottom.png) | ![PCB top and silkscreen](images/easyeda/pcb.png) | ![3D view](images/easyeda/3d-view.png) |
+
+
 RP2040-Zero blink LED
 ---------------------
 
